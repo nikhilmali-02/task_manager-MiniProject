@@ -48,7 +48,7 @@ class TaskController extends ChangeNotifier {
     try{
       final toggled = tasks.copyWith(isCompleted: !tasks.isCompleted);
       var result = await service.loadTasks();
-      result = result.map((item) => item == tasks ? toggled : item).toList();
+      result = result.map((item) => item.id == tasks.id ? toggled : item).toList();
       await service.saveTasks(result);
       await loadTask();
       notifyListeners();
@@ -64,7 +64,7 @@ class TaskController extends ChangeNotifier {
   Future<void> deleteTask(Taskmodel tasks) async {
     try{
       var result = await service.loadTasks();
-      result.removeWhere((item) => item == tasks);
+      result.removeWhere((item) => item.id == tasks.id);
       await service.saveTasks(result);
       await loadTask();
       notifyListeners();
@@ -80,7 +80,7 @@ class TaskController extends ChangeNotifier {
   Future<void> updateTask(Taskmodel tasks) async {
     try{
       var result = await service.loadTasks();
-      result = result.map((item) => item == tasks ? tasks : item).toList();
+      result = result.map((item) => item.id == tasks.id ? tasks : item).toList();
       await service.saveTasks(result);
       await loadTask();
       notifyListeners();

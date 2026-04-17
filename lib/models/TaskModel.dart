@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 class Taskmodel {
+  final String id;
   final String title;
   final String? subtitle;
   final bool isCompleted;
@@ -9,6 +10,7 @@ class Taskmodel {
   final Duration? period;
 
   Taskmodel({
+    required this.id,
     required this.title,
     required this.priority,
     required this.time,
@@ -21,6 +23,7 @@ class Taskmodel {
     bool? isCompleted,
   }) {
     return Taskmodel(
+      id: id,
       title: title,
       priority: priority,
       time: time,
@@ -32,6 +35,7 @@ class Taskmodel {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'title': title,
       'subtitle': subtitle,
       'isCompleted': isCompleted,
@@ -43,6 +47,7 @@ class Taskmodel {
 
   factory Taskmodel.fromJson(Map<String, dynamic> Json){
     return Taskmodel(
+        id: Json['id'],
         title: Json['title'],
         subtitle: Json['subtitle'],
         priority: Json['priority'],
