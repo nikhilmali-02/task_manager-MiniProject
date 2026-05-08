@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:task_manager/Controllers/task_controller.dart';
+import 'package:task_manager/screens/AddTaskScreen.dart';
+import 'package:task_manager/screens/home_screen.dart';
 import 'package:task_manager/services/task_service.dart';
 
 void main(){
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget{
@@ -24,7 +26,6 @@ class MyApp extends StatelessWidget{
 final GoRouter router = GoRouter(
   routes: [
     GoRoute(path: '/', builder: (context, state) => HomeScreen() ),
-    GoRoute(path: '/add', builder: (context, state) => AddTaskScreen()),
-    GoRoute(path: '/settings', builder: (context, state) => SettingsScreen()),
+    GoRoute(path: '/add', builder: (context, state) => Addtaskscreen()),
     ]
 );

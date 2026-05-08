@@ -30,9 +30,13 @@ class HomeScreen_State extends State<HomeScreen> {
     ];
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(onPressed: (){
-        context.go('/add');
-      }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+        await context.push('/add');
+        context.read<TaskController>().loadTask();
+      },
+        child: Icon(Icons.add),
+      ),
       appBar: AppBar(
         actions: [
           IconButton(onPressed: () => context.go('/setting'), icon: Icon(Icons.settings))
