@@ -19,6 +19,22 @@ class HomeScreen_State extends State<HomeScreen> {
     });
   }
 
+  String _formatTime(DateTime time){
+    final hour = time.hour == 0 ? 12 : time.hour > 12  ? time.hour - 12 : time.hour;
+    final minute = time.minute.toString().padLeft(2,'0');
+    final period = time.hour >= 12 ? 'PM' : 'AM';
+    return '$hour:$minute $period';
+  }
+
+  Color _priorityColor(String priority) {
+    switch (priority){
+      case 'High': return Colors.red;
+      case 'Medium' : return Colors.orange;
+      case 'Low' : return Colors.green;
+      default: return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -39,19 +55,38 @@ class HomeScreen_State extends State<HomeScreen> {
       ),
       appBar: AppBar(
         actions: [
-          IconButton(onPressed: () => context.go('/setting'), icon: Icon(Icons.settings))
+          IconButton(onPressed: () => context.push('/setting'), icon: Icon(Icons.settings))
         ],
         title: Text('MyTasks'),
       ),
       body: controller.isLoading
           ? Center(child: CircularProgressIndicator())
-          : controller.completedList.isEmpty && controller.incompeletedList.isEmpty
-              ? Center(child: Text('No Task Yet!'))
-              : ListView.builder(
-                  itemCount: allTask.length,
-                  itemBuilder: (context,index){
+          : controller.error != null
+              ?Center(child: Text(controller.error!),)
+              : controller.completedList.isEmpty && controller.incompeletedList.isEmpty
+                  ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.task_alt, size: 80, color: Colors.grey),
+            SizedBox(height: 16),
+            Text('No Tasks Yet!', style: TextStyle(fontSize: 18, color: Colors.grey)),
+            SizedBox(height: 8),
+            Text('Tap + to add a task', style: TextStyle(fontSize: 14, color: Colors.grey)),
+          ],
+        ),
+      )
+                  : ListView.builder(
+                    itemCount: allTask.length,
+                    itemBuilder: (context,index){
                     final task = allTask[index];
                     return Dismissible(key: Key(task.id),
+                        background: Container(
+                          color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          padding: EdgeInsets.only(right: 16),
+                          child: Icon(Icons.delete,color: Colors.white),
+                        ),
                         direction: DismissDirection.endToStart,
                         onDismissed: (_) =>   context.read<TaskController>().deleteTask(task),
                         child: Card(
@@ -62,10 +97,23 @@ class HomeScreen_State extends State<HomeScreen> {
                                 decoration: task.isCompleted ? TextDecoration.lineThrough : null
                               ),
                             ),
-                            subtitle: Text(task.subtitle ?? ''),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(task.subtitle ?? '',),
+                                Text(_formatTime(task.time), style: TextStyle(fontSize: 12, color: Colors.grey)),
+                              ],
+                            ),
                               leading: Checkbox(value: task.isCompleted,
-                                onChanged: (_) => context.read<TaskController>().toggleTask(task) ),
-                              trailing: Text(task.priority),
+                                onChanged: (_) => context.read<TaskController>().toggleTask(task)),
+                              trailing: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8, vertical:4),
+                                decoration: BoxDecoration(
+                                  color: _priorityColor(task.priority),
+                                  borderRadius: BorderRadius.circular(8)
+                                ),
+                                child: Text(task.priority,style: TextStyle(color: Colors.white, fontSize: 12),),
+                              ),
                           ),
                         )
                     );

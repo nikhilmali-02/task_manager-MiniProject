@@ -20,6 +20,6 @@ class TaskService {
     Future<void> addTasks(Taskmodel tasks) async {
       final add = await loadTasks();
       add.add(tasks);
-      final save = await saveTasks(add);
+      await saveTasks(add);
     }
 }
