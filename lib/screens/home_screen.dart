@@ -19,11 +19,25 @@ class HomeScreen_State extends State<HomeScreen> {
     });
   }
 
-  String _formatTime(DateTime time){
+  String _formatDateTime(DateTime time){
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = DateTime(now.year, now.month, now.day + 1);
+    final taskDate = DateTime(time.year, time.month, time.day);
+
+    String dateLabel;
+    if (taskDate == today){
+      dateLabel = 'Today';
+    } else if (taskDate == tomorrow){
+      dateLabel = 'Tommorrow';
+    } else {
+      dateLabel = '${time.day}/${time.month}/${time.year}';
+    }
+
     final hour = time.hour == 0 ? 12 : time.hour > 12  ? time.hour - 12 : time.hour;
     final minute = time.minute.toString().padLeft(2,'0');
     final period = time.hour >= 12 ? 'PM' : 'AM';
-    return '$hour:$minute $period';
+    return '$dateLabel,$hour:$minute $period';
   }
 
   Color _priorityColor(String priority) {
@@ -101,18 +115,28 @@ class HomeScreen_State extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(task.subtitle ?? '',),
-                                Text(_formatTime(task.time), style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                Text(_formatDateTime(task.time), style: TextStyle(fontSize: 12, color: Colors.grey)),
                               ],
                             ),
                               leading: Checkbox(value: task.isCompleted,
                                 onChanged: (_) => context.read<TaskController>().toggleTask(task)),
-                              trailing: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical:4),
-                                decoration: BoxDecoration(
-                                  color: _priorityColor(task.priority),
-                                  borderRadius: BorderRadius.circular(8)
-                                ),
-                                child: Text(task.priority,style: TextStyle(color: Colors.white, fontSize: 12),),
+                              trailing: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 8, vertical:4),
+                                    decoration: BoxDecoration(
+                                      color: _priorityColor(task.priority),
+                                      borderRadius: BorderRadius.circular(8)
+                                    ),
+                                    child: Text(task.priority,style: TextStyle(color: Colors.white, fontSize: 12),),
+                                  ),
+                                  if(task.isCompleted == false)
+                                    IconButton(onPressed: () {
+                                      context.push('/edit/${task.id}');
+                                    }, icon: Icon(Icons.edit))
+                                ],
                               ),
                           ),
                         )

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager/models/TaskModel.dart';
+import 'package:task_manager/services/notification_service.dart';
 import 'package:task_manager/services/task_service.dart';
 
 class TaskController extends ChangeNotifier {
@@ -35,6 +36,7 @@ class TaskController extends ChangeNotifier {
       notifyListeners();
       await service.addTasks(tasks);
       await loadTask();
+      NotificationService.scheduleNotification(tasks);
     } catch (e){
       error = "Falied to load";
       notifyListeners();
@@ -83,6 +85,7 @@ class TaskController extends ChangeNotifier {
       result = result.map((item) => item.id == tasks.id ? tasks : item).toList();
       await service.saveTasks(result);
       await loadTask();
+      NotificationService.scheduleNotification(tasks);
       notifyListeners();
     } catch (e){
       error = "Falied to load";

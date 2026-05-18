@@ -28,8 +28,11 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  flutter_local_notifications: ^19.2.1
+  timezone: ^0.10.0
+  flutter_native_timezone_2025: ^1.0.1
   provider: ^6.0.0
-  go_router: ^14.0.0
+  go_router: ^17.1.0
   uuid: ^4.0.0
   shared_preferences: ^2.5.5
   flutter:

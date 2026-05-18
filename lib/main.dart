@@ -6,12 +6,15 @@ import 'package:task_manager/Controllers/theme_controller.dart';
 import 'package:task_manager/screens/AddTaskScreen.dart';
 import 'package:task_manager/screens/home_screen.dart';
 import 'package:task_manager/screens/setting_screen.dart';
+import 'package:task_manager/services/notification_service.dart';
 import 'package:task_manager/services/task_service.dart';
+import 'package:task_manager/screens/EditTaskScreen.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   final themeController = ThemeController();
   await themeController.loadTheme();
+  await NotificationService.init();
   runApp(MyApp(themeController: themeController));
 }
 
@@ -53,6 +56,12 @@ final GoRouter router = GoRouter(
   routes: [
     GoRoute(path: '/', builder: (context, state) => HomeScreen() ),
     GoRoute(path: '/add', builder: (context, state) => Addtaskscreen()),
-    GoRoute(path: '/setting', builder: (context, state) => SettingScreen())
-    ]
+    GoRoute(path: '/setting', builder: (context, state) => SettingScreen()),
+    GoRoute(
+      path: '/edit/:id',
+      builder: (context, state) => Edittaskscreen(
+       id: state.pathParameters['id']!,
+      ),
+    )
+  ]
 );
