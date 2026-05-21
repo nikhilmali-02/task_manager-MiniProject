@@ -4,19 +4,27 @@ import 'package:provider/provider.dart';
 import 'package:task_manager/Controllers/task_controller.dart';
 import 'package:task_manager/main.dart';
 
-class HomeScreen extends StatefulWidget{
+class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => HomeScreen_State();
 }
 
-class HomeScreen_State extends State<HomeScreen> {
+class HomeScreen_State extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_){
       context.read<TaskController>().loadTask();
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      context.read<TaskController>().loadTask();
+    }
   }
 
   String _formatDateTime(DateTime time){
@@ -144,5 +152,10 @@ class HomeScreen_State extends State<HomeScreen> {
                   },)
 
     );
+  }
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 }

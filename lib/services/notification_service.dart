@@ -1,8 +1,26 @@
+import 'dart:convert';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_manager/models/TaskModel.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:flutter_native_timezone_2025/flutter_native_timezone_2025.dart';
+
+  @pragma('vm:entry-point')
+  void notificationTapBackground(NotificationResponse response)async{
+    if(response.actionId == 'task') {
+      String? taskID = response.payload;
+      final prefs = await SharedPreferences.getInstance();
+      final string = prefs.getStringList("key") ?? [];
+      var task = string.map((string) => Taskmodel.fromJson(jsonDecode(string))).toList();
+      final found = task.firstWhere((t) => t.id == taskID);
+      final updated = found.copyWith(isCompleted: true);
+      final save = task.map((t) => jsonEncode(t.id == taskID ? updated.toJson() : t.toJson())).toList();
+      await prefs.setStringList('key', save);
+    }
+
+  }
 
 class NotificationService {
 
@@ -19,7 +37,7 @@ class NotificationService {
 
     const InitializationSettings settings = InitializationSettings(android: androidSettings);
 
-    await FlutterLocalNotificationsPlugin().initialize(settings);
+    await FlutterLocalNotificationsPlugin().initialize(settings,onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
 
     await FlutterLocalNotificationsPlugin().resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
   }
@@ -35,10 +53,12 @@ class NotificationService {
           android: AndroidNotificationDetails(
               'task_channel',
               'Task Reminders',
+            actions: [const AndroidNotificationAction('task', 'Mark as Completed'),],
             importance: Importance.high,
             priority: Priority.high
           )
         ),
+        payload: task.id,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle
     );
   }
