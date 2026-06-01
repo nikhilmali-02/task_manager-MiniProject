@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_manager/models/TaskModel.dart';
 
+import 'notification_service.dart';
+
 class TaskService {
     Future<void> saveTasks(List<Taskmodel> tasks) async {
       final prefs = await SharedPreferences.getInstance();
@@ -17,9 +19,32 @@ class TaskService {
       return load;
     }
 
-    Future<void> addTasks(Taskmodel tasks) async {
+    Future<void> addTask(Taskmodel tasks) async {
       final add = await loadTasks();
       add.add(tasks);
       await saveTasks(add);
+    }
+
+    Future<List<Taskmodel>> toggleTask(String id) async{
+      var result = await loadTasks();
+      final task = result.firstWhere((item) => item.id == id);
+      final toggled = task.copyWith(isCompleted: !task.isCompleted);
+      result = result.map((item) => item.id == task.id ? toggled : item).toList();
+      await saveTasks(result);
+      return result;
+    }
+
+    Future<List<Taskmodel>> deleteTask(String id) async{
+      var result = await loadTasks();
+      result.removeWhere((item) => item.id == id);
+      await saveTasks(result);
+      return result;
+    }
+
+    Future<List<Taskmodel>> updateTask(Taskmodel task) async {
+      var result = await loadTasks();
+      result = result.map((item) => item.id == task.id ? task : item).toList();
+      await saveTasks(result);
+      return result;
     }
 }
