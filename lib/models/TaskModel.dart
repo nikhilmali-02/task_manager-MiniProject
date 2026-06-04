@@ -1,6 +1,4 @@
-import 'dart:convert';
-
-class Taskmodel {
+class TaskModel {
   final String id;
   final String title;
   final String? subtitle;
@@ -9,7 +7,7 @@ class Taskmodel {
   final DateTime time;
   final Duration? period;
 
-  Taskmodel({
+  TaskModel({
     required this.id,
     required this.title,
     required this.priority,
@@ -19,10 +17,8 @@ class Taskmodel {
     this.isCompleted = false,
   });
 
-  Taskmodel copyWith({
-    bool? isCompleted,
-  }) {
-    return Taskmodel(
+  TaskModel copyWith({bool? isCompleted}) {
+    return TaskModel(
       id: id,
       title: title,
       priority: priority,
@@ -45,15 +41,15 @@ class Taskmodel {
     };
   }
 
-  factory Taskmodel.fromJson(Map<String, dynamic> Json){
-    return Taskmodel(
-        id: Json['id'],
-        title: Json['title'],
-        subtitle: Json['subtitle'],
-        priority: Json['priority'],
-        time: DateTime.parse(Json['time']),
-        period: Json['period'] != null ? Duration(minutes: Json['period']) : null,
-        isCompleted: Json['isCompleted'] ?? false
+  factory TaskModel.fromJson(Map<String, dynamic> Json) {
+    return TaskModel(
+      id: Json['id'],
+      title: Json['title'],
+      subtitle: Json['subtitle'],
+      priority: Json['priority'],
+      time: DateTime.parse(Json['time']),
+      period: Json['period'] != null ? Duration(minutes: Json['period']) : null,
+      isCompleted: Json['isCompleted'] ?? false,
     );
   }
 }

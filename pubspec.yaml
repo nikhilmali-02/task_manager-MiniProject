@@ -28,6 +28,11 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  firebase_core: ^4.6.0
+  firebase_auth: ^6.3.0
+  cloud_firestore: ^6.2.0
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.8
   flutter_local_notifications: ^19.2.1
   timezone: ^0.10.0
   flutter_native_timezone_2025: ^1.0.1

@@ -7,14 +7,12 @@ import 'package:task_manager/bloc/task_event.dart';
 import 'package:task_manager/models/TaskModel.dart';
 import 'package:uuid/uuid.dart';
 
-class Addtaskscreen extends StatefulWidget{
+class AddTaskScreen extends StatefulWidget {
   @override
-  State<Addtaskscreen> createState() => AddTasks();
-
+  State<AddTaskScreen> createState() => _AddTasksScreen();
 }
 
-class AddTasks extends State<Addtaskscreen> {
-
+class _AddTasksScreen extends State<AddTaskScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _subtitleController = TextEditingController();
@@ -24,15 +22,23 @@ class AddTasks extends State<Addtaskscreen> {
 
   Future<DateTime?> _pickDateTime() async {
     final date = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2100)
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
     );
     if (date == null) return null;
     final time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.noScaling),
+          child: child!,
+        );
+      },
     );
     if (time == null) return null;
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
@@ -43,66 +49,75 @@ class AddTasks extends State<Addtaskscreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Add Task"),
-        leading: IconButton(onPressed: () => context.pop(), icon: Icon(Icons.arrow_back)),
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: Icon(Icons.arrow_back),
+        ),
       ),
       body: Center(
-          child: Form(key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextFormField(
-                    controller: _titleController,
-                    textAlign: TextAlign.left,
-                    decoration: const InputDecoration(labelText: 'Enter the Task'),
-                    validator: (value){
-                      if(value == null || value.isEmpty){
-                        return 'Please Enter Task';
-                      }
-                      return null;
-                    },
-                  ),
-                TextFormField(
-                  controller: _subtitleController,
-                  textAlign: TextAlign.left,
-                  decoration: const InputDecoration(labelText: 'Add Description'),
-                ),
-                  DropdownButtonFormField<String>(
-                      value: _selectedPriority,
-                      items: ['High','Medium','Low'].
-                      map((p) => DropdownMenuItem(
-                          value: p,
-                          child: Text(p),
-                      )
-                      ).toList(),
-                    onChanged: (value) => setState(() => _selectedPriority = value!),
-                    decoration: InputDecoration(labelText: "Priority"),
-                  ),
-                  ListTile(
-                    title: Text(_selectedTime == null ? 'Select Time' : _selectedTime.toString()),
-                    trailing: Icon(Icons.access_time),
-                    onTap: () async {
-                      final picked = await _pickDateTime();
-                      if(picked != null) setState(() => _selectedTime = picked);
-                    },
-                  ),
-                  ElevatedButton(
-                      onPressed: () async {
-                        if(_formKey.currentState!.validate()){
-                          final task = Taskmodel(id: const Uuid().v4(),
-                            title: _titleController.text,
-                            subtitle: _subtitleController.text.isEmpty ? null : _subtitleController.text,
-                            priority: _selectedPriority,
-                            time: _selectedTime ?? DateTime.now(),
-                          );
-                          context.read<TaskBloc>().add(AddTaskEvent(task: task));
-                          context.pop();
-                        }
-                      },
-                      child: Text('Add Task')
-                  ),
-                ],
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextFormField(
+                controller: _titleController,
+                textAlign: TextAlign.left,
+                decoration: const InputDecoration(labelText: 'Enter the Task'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please Enter Task';
+                  }
+                  return null;
+                },
               ),
+              TextFormField(
+                controller: _subtitleController,
+                textAlign: TextAlign.left,
+                decoration: const InputDecoration(labelText: 'Add Description'),
+              ),
+              DropdownButtonFormField<String>(
+                value: _selectedPriority,
+                items: ['High', 'Medium', 'Low']
+                    .map((p) => DropdownMenuItem(value: p, child: Text(p)))
+                    .toList(),
+                onChanged: (value) =>
+                    setState(() => _selectedPriority = value!),
+                decoration: InputDecoration(labelText: "Priority"),
+              ),
+              ListTile(
+                title: Text(
+                  _selectedTime == null
+                      ? 'Select Time'
+                      : _selectedTime.toString(),
+                ),
+                trailing: Icon(Icons.access_time),
+                onTap: () async {
+                  final picked = await _pickDateTime();
+                  if (picked != null) setState(() => _selectedTime = picked);
+                },
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    final task = TaskModel(
+                      id: const Uuid().v4(),
+                      title: _titleController.text,
+                      subtitle: _subtitleController.text.isEmpty
+                          ? null
+                          : _subtitleController.text,
+                      priority: _selectedPriority,
+                      time: _selectedTime ?? DateTime.now(),
+                    );
+                    context.read<TaskBloc>().add(AddTaskEvent(task: task));
+                    context.pop();
+                  }
+                },
+                child: Text('Add Task'),
+              ),
+            ],
           ),
+        ),
       ),
     );
   }
