@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import 'package:task_manager/Controllers/task_controller.dart';
+import 'package:task_manager/bloc/task_bloc.dart';
+import 'package:task_manager/bloc/task_event.dart';
 import 'package:task_manager/models/TaskModel.dart';
+
+import '../bloc/TaskState.dart';
 
 class Edittaskscreen extends StatefulWidget {
   final String id;
@@ -27,12 +30,14 @@ class _Edittaskscreen extends State<Edittaskscreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_){
-      final task = context.read<TaskController>().incompeletedList
-          .firstWhere((t) => t.id == widget.id);
-      _titleController.text = task.title;
-      _subtitleController.text = task.subtitle ?? '';
-      _selectedPriority = task.priority;
-      _selectedTime = task.time;
+      final state = context.read<TaskBloc>().state;
+      if (state is TaskLoadedState) {
+        final task = state.task.firstWhere((t) => t.id == widget.id);
+        _titleController.text = task.title;
+        _subtitleController.text = task.subtitle ?? '';
+        _selectedPriority = task.priority;
+        _selectedTime = task.time;
+      }
     });
   }
 
@@ -54,11 +59,9 @@ class _Edittaskscreen extends State<Edittaskscreen> {
 
   @override
   Widget build(BuildContext context) {
-    context.read<TaskController>().incompeletedList
-        .firstWhere((t) => t.id == widget.id);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Task"),
+        title: Text("Edit Task"),
         leading: IconButton(onPressed: () => context.pop(), icon: Icon(Icons.arrow_back)),
       ),
       body: Center(
@@ -110,7 +113,7 @@ class _Edittaskscreen extends State<Edittaskscreen> {
                         priority: _selectedPriority,
                         time: _selectedTime ?? DateTime.now(),
                       );
-                      await context.read<TaskController>().updateTask(task);
+                      context.read<TaskBloc>().add(UpdateTaskEvent(task: task));
                       context.pop();
                     }
                   },

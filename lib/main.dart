@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:task_manager/Controllers/task_controller.dart';
 import 'package:task_manager/Controllers/theme_controller.dart';
+import 'package:task_manager/bloc/task_bloc.dart';
 import 'package:task_manager/screens/AddTaskScreen.dart';
 import 'package:task_manager/screens/home_screen.dart';
 import 'package:task_manager/screens/setting_screen.dart';
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
-      ChangeNotifierProvider(create: (_) => TaskController(TaskService())),
+      BlocProvider(create: (_) => TaskBloc()),
       ChangeNotifierProvider.value(value: themeController)
     ],
       child: const AppRoot(),

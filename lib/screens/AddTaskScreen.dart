@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:task_manager/Controllers/task_controller.dart';
+import 'package:task_manager/bloc/task_bloc.dart';
+import 'package:task_manager/bloc/task_event.dart';
 import 'package:task_manager/models/TaskModel.dart';
 import 'package:uuid/uuid.dart';
 
@@ -92,7 +94,7 @@ class AddTasks extends State<Addtaskscreen> {
                             priority: _selectedPriority,
                             time: _selectedTime ?? DateTime.now(),
                           );
-                          await context.read<TaskController>().addTask(task);
+                          context.read<TaskBloc>().add(AddTaskEvent(task: task));
                           context.pop();
                         }
                       },
