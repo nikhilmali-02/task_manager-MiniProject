@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (taskDate == today) {
       dateLabel = 'Today';
     } else if (taskDate == tomorrow) {
-      dateLabel = 'Tommorrow';
+      dateLabel = 'Tomorrow';
     } else {
       dateLabel = '${time.day}/${time.month}/${time.year}';
     }
@@ -71,6 +71,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
         onPressed: () async {
           await context.push('/add');
           context.read<TaskBloc>().add(LoadTasksEvent());
@@ -78,9 +80,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         child: Icon(Icons.add),
       ),
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepPurple, Colors.blueAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         actions: [
           IconButton(
-            onPressed: () => context.push('/setting'),
+            onPressed: () {
+              context.push('/setting');
+            },
             icon: Icon(Icons.settings),
           ),
         ],
@@ -132,60 +145,75 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     DeleteTaskEvent(id: task.id),
                   ),
                   child: Card(
-                    child: ListTile(
-                      title: Text(
-                        task.title,
-                        style: TextStyle(
-                          decoration: task.isCompleted
-                              ? TextDecoration.lineThrough
-                              : null,
-                        ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(task.subtitle ?? ''),
-                          Text(
-                            _formatDateTime(task.time),
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                    elevation: 4,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          left: BorderSide(
+                            color: _priorityColor(task.priority),
+                            width: 4,
                           ),
-                        ],
-                      ),
-                      leading: Checkbox(
-                        value: task.isCompleted,
-                        onChanged: (_) => context.read<TaskBloc>().add(
-                          ToggleTaskEvent(id: task.id),
                         ),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      trailing: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _priorityColor(task.priority),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              task.priority,
+                      child: ListTile(
+                        title: Text(
+                          task.title,
+                          style: TextStyle(
+                            decoration: task.isCompleted
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(task.subtitle ?? ''),
+                            Text(
+                              _formatDateTime(task.time),
                               style: TextStyle(
-                                color: Colors.white,
                                 fontSize: 12,
+                                color: Colors.grey,
                               ),
                             ),
+                          ],
+                        ),
+                        leading: Checkbox(
+                          value: task.isCompleted,
+                          onChanged: (_) => context.read<TaskBloc>().add(
+                            ToggleTaskEvent(id: task.id),
                           ),
-                          if (task.isCompleted == false)
-                            IconButton(
-                              onPressed: () {
-                                context.push('/edit/${task.id}');
-                              },
-                              icon: Icon(Icons.edit),
+                        ),
+                        trailing: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _priorityColor(task.priority),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                task.priority,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
-                        ],
+                            if (task.isCompleted == false)
+                              IconButton(
+                                onPressed: () {
+                                  context.push('/edit/${task.id}');
+                                },
+                                icon: Icon(Icons.edit),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -199,5 +227,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 }
