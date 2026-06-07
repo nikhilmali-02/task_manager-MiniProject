@@ -17,8 +17,7 @@ import 'package:task_manager/services/notification_service.dart';
 import 'package:task_manager/services/task_service.dart';
 import 'package:task_manager/screens/EditTaskScreen.dart';
 
-
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final themeController = ThemeController();
   await themeController.loadTheme();
@@ -27,25 +26,23 @@ void main() async{
   runApp(MyApp(themeController: themeController));
 }
 
-
-class MyApp extends StatelessWidget{
-
+class MyApp extends StatelessWidget {
   final ThemeController themeController;
   const MyApp({required this.themeController});
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(providers: [
-      BlocProvider(create: (_) => TaskBloc()),
-      ChangeNotifierProvider.value(value: themeController)
-    ],
+    return MultiProvider(
+      providers: [
+        BlocProvider(create: (_) => TaskBloc()),
+        ChangeNotifierProvider.value(value: themeController),
+      ],
       child: const AppRoot(),
     );
   }
-
 }
 
-class AppRoot extends StatelessWidget{
+class AppRoot extends StatelessWidget {
   const AppRoot();
 
   @override
@@ -65,24 +62,23 @@ final GoRouter router = GoRouter(
   redirect: (context, state) {
     final user = FirebaseAuth.instance.currentUser;
     final isLoggedIn = user != null;
-    final isOnAuthRoute = state.matchedLocation == '/login' ||
-        state.matchedLocation == '/signup';
+    final isOnAuthRoute =
+        state.matchedLocation == '/login' || state.matchedLocation == '/signup';
 
     if (!isLoggedIn && !isOnAuthRoute) return '/login';
     if (isLoggedIn && isOnAuthRoute) return '/';
     return null;
   },
   routes: [
-    GoRoute(path: '/', builder: (context, state) => HomeScreen() ),
-    GoRoute(path: '/add', builder: (context, state) => Addtaskscreen()),
+    GoRoute(path: '/', builder: (context, state) => HomeScreen()),
+    GoRoute(path: '/add', builder: (context, state) => AddTaskScreen()),
     GoRoute(path: '/setting', builder: (context, state) => SettingScreen()),
     GoRoute(path: '/login', builder: (context, state) => LoginScreen()),
     GoRoute(path: '/signup', builder: (context, state) => SignupScreen()),
     GoRoute(
       path: '/edit/:id',
-      builder: (context, state) => Edittaskscreen(
-       id: state.pathParameters['id']!,
-      ),
-    )
-  ]
+      builder: (context, state) =>
+          EditTaskScreen(id: state.pathParameters['id']!),
+    ),
+  ],
 );

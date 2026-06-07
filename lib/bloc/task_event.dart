@@ -5,17 +5,17 @@ abstract class TaskEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadTasksEvent extends TaskEvent{}
+class LoadTasksEvent extends TaskEvent {}
 
-class AddTaskEvent extends TaskEvent{
-  final Taskmodel task;
+class AddTaskEvent extends TaskEvent {
+  final TaskModel task;
 
   AddTaskEvent({required this.task});
   @override
   List<Object?> get props => [task];
 }
 
-class ToggleTaskEvent extends TaskEvent{
+class ToggleTaskEvent extends TaskEvent {
   final String id;
 
   ToggleTaskEvent({required this.id});
@@ -24,7 +24,7 @@ class ToggleTaskEvent extends TaskEvent{
   List<Object?> get props => [id];
 }
 
-class DeleteTaskEvent extends TaskEvent{
+class DeleteTaskEvent extends TaskEvent {
   final String id;
 
   DeleteTaskEvent({required this.id});
@@ -32,8 +32,8 @@ class DeleteTaskEvent extends TaskEvent{
   List<Object?> get props => [id];
 }
 
-class UpdateTaskEvent extends TaskEvent{
-  final Taskmodel task;
+class UpdateTaskEvent extends TaskEvent {
+  final TaskModel task;
 
   UpdateTaskEvent({required this.task});
   @override

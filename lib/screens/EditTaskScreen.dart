@@ -9,27 +9,25 @@ import 'package:task_manager/models/TaskModel.dart';
 
 import '../bloc/TaskState.dart';
 
-class Edittaskscreen extends StatefulWidget {
+class EditTaskScreen extends StatefulWidget {
   final String id;
-  Edittaskscreen({required this.id});
+  EditTaskScreen({required this.id});
 
   @override
-  State<Edittaskscreen> createState() => _Edittaskscreen();
+  State<EditTaskScreen> createState() => _EditTaskScreen();
 }
 
-class _Edittaskscreen extends State<Edittaskscreen> {
-
+class _EditTaskScreen extends State<EditTaskScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _subtitleController = TextEditingController();
   String _selectedPriority = 'Medium';
   DateTime? _selectedTime;
 
-
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = context.read<TaskBloc>().state;
       if (state is TaskLoadedState) {
         final task = state.task.firstWhere((t) => t.id == widget.id);
@@ -43,15 +41,23 @@ class _Edittaskscreen extends State<Edittaskscreen> {
 
   Future<DateTime?> _pickDateTime() async {
     final date = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2100)
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
     );
     if (date == null) return null;
     final time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.noScaling),
+          child: child!,
+        );
+      },
     );
     if (time == null) return null;
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
@@ -62,10 +68,14 @@ class _Edittaskscreen extends State<Edittaskscreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Edit Task"),
-        leading: IconButton(onPressed: () => context.pop(), icon: Icon(Icons.arrow_back)),
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: Icon(Icons.arrow_back),
+        ),
       ),
       body: Center(
-        child: Form(key: _formKey,
+        child: Form(
+          key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -73,8 +83,8 @@ class _Edittaskscreen extends State<Edittaskscreen> {
                 controller: _titleController,
                 textAlign: TextAlign.left,
                 decoration: const InputDecoration(labelText: 'Enter the Task'),
-                validator: (value){
-                  if(value == null || value.isEmpty){
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
                     return 'Please Enter Task';
                   }
                   return null;
@@ -87,37 +97,42 @@ class _Edittaskscreen extends State<Edittaskscreen> {
               ),
               DropdownButtonFormField<String>(
                 value: _selectedPriority,
-                items: ['High','Medium','Low'].
-                map((p) => DropdownMenuItem(
-                  value: p,
-                  child: Text(p),
-                )
-                ).toList(),
-                onChanged: (value) => setState(() => _selectedPriority = value!),
+                items: ['High', 'Medium', 'Low']
+                    .map((p) => DropdownMenuItem(value: p, child: Text(p)))
+                    .toList(),
+                onChanged: (value) =>
+                    setState(() => _selectedPriority = value!),
                 decoration: InputDecoration(labelText: "Priority"),
               ),
               ListTile(
-                title: Text(_selectedTime == null ? 'Select Time' : _selectedTime.toString()),
+                title: Text(
+                  _selectedTime == null
+                      ? 'Select Time'
+                      : _selectedTime.toString(),
+                ),
                 trailing: Icon(Icons.access_time),
                 onTap: () async {
                   final picked = await _pickDateTime();
-                  if(picked != null) setState(() => _selectedTime = picked);
+                  if (picked != null) setState(() => _selectedTime = picked);
                 },
               ),
               ElevatedButton(
-                  onPressed: () async {
-                    if(_formKey.currentState!.validate()){
-                      final task = Taskmodel(id: widget.id,
-                        title: _titleController.text,
-                        subtitle: _subtitleController.text.isEmpty ? null : _subtitleController.text,
-                        priority: _selectedPriority,
-                        time: _selectedTime ?? DateTime.now(),
-                      );
-                      context.read<TaskBloc>().add(UpdateTaskEvent(task: task));
-                      context.pop();
-                    }
-                  },
-                  child: Text('Update')
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    final task = TaskModel(
+                      id: widget.id,
+                      title: _titleController.text,
+                      subtitle: _subtitleController.text.isEmpty
+                          ? null
+                          : _subtitleController.text,
+                      priority: _selectedPriority,
+                      time: _selectedTime ?? DateTime.now(),
+                    );
+                    context.read<TaskBloc>().add(UpdateTaskEvent(task: task));
+                    context.pop();
+                  }
+                },
+                child: Text('Update'),
               ),
             ],
           ),
