@@ -64,9 +64,7 @@ class NotificationService {
         android: AndroidNotificationDetails(
           'task_channel',
           'Task Reminders',
-          actions: [
-            const AndroidNotificationAction('task', 'Mark as Completed'),
-          ],
+          actions: [AndroidNotificationAction('task', 'Mark as Completed')],
           importance: Importance.high,
           priority: Priority.high,
         ),

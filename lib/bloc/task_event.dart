@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:task_manager/models/TaskModel.dart';
 
 abstract class TaskEvent extends Equatable {
+  @override
   List<Object?> get props => [];
 }
 

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:task_manager/Controllers/task_controller.dart';
 import 'package:task_manager/Controllers/theme_controller.dart';
 import 'package:task_manager/bloc/task_bloc.dart';
 import 'package:task_manager/firebase_options.dart';
@@ -14,7 +13,6 @@ import 'package:task_manager/screens/SignupScreen.dart';
 import 'package:task_manager/screens/home_screen.dart';
 import 'package:task_manager/screens/setting_screen.dart';
 import 'package:task_manager/services/notification_service.dart';
-import 'package:task_manager/services/task_service.dart';
 import 'package:task_manager/screens/EditTaskScreen.dart';
 
 void main() async {
@@ -28,7 +26,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final ThemeController themeController;
-  const MyApp({required this.themeController});
+  const MyApp({super.key, required this.themeController});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +41,7 @@ class MyApp extends StatelessWidget {
 }
 
 class AppRoot extends StatelessWidget {
-  const AppRoot();
+  const AppRoot({super.key});
 
   @override
   Widget build(BuildContext context) {

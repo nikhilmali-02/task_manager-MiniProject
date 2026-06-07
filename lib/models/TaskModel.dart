@@ -41,15 +41,15 @@ class TaskModel {
     };
   }
 
-  factory TaskModel.fromJson(Map<String, dynamic> Json) {
+  factory TaskModel.fromJson(Map<String, dynamic> json) {
     return TaskModel(
-      id: Json['id'],
-      title: Json['title'],
-      subtitle: Json['subtitle'],
-      priority: Json['priority'],
-      time: DateTime.parse(Json['time']),
-      period: Json['period'] != null ? Duration(minutes: Json['period']) : null,
-      isCompleted: Json['isCompleted'] ?? false,
+      id: json['id'],
+      title: json['title'],
+      subtitle: json['subtitle'],
+      priority: json['priority'],
+      time: DateTime.parse(json['time']),
+      period: json['period'] != null ? Duration(minutes: json['period']) : null,
+      isCompleted: json['isCompleted'] ?? false,
     );
   }
 }

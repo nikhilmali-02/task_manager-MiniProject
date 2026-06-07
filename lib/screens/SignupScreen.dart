@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../services/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
+
   @override
   State<SignupScreen> createState() => _SignupScreenState();
 }

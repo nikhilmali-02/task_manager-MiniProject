@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:task_manager/Controllers/task_controller.dart';
 import 'package:task_manager/bloc/task_bloc.dart';
 import 'package:task_manager/bloc/task_event.dart';
 import 'package:task_manager/models/TaskModel.dart';
 import 'package:uuid/uuid.dart';
 
 class AddTaskScreen extends StatefulWidget {
+  const AddTaskScreen({super.key});
+
   @override
-  State<AddTaskScreen> createState() => _AddTasksScreen();
+  State<AddTaskScreen> createState() => _AddTaskScreenState();
 }
 
-class _AddTasksScreen extends State<AddTaskScreen> {
+class _AddTaskScreenState extends State<AddTaskScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _subtitleController = TextEditingController();
   String _selectedPriority = 'Medium';
   DateTime? _selectedTime;
-  int? _periodMinutes;
 
   Future<DateTime?> _pickDateTime() async {
     final date = await showDatePicker(
@@ -77,7 +77,7 @@ class _AddTasksScreen extends State<AddTaskScreen> {
                 decoration: const InputDecoration(labelText: 'Add Description'),
               ),
               DropdownButtonFormField<String>(
-                value: _selectedPriority,
+                initialValue: _selectedPriority,
                 items: ['High', 'Medium', 'Low']
                     .map((p) => DropdownMenuItem(value: p, child: Text(p)))
                     .toList(),

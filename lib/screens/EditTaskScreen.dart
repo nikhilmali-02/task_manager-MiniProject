@@ -11,7 +11,7 @@ import '../bloc/TaskState.dart';
 
 class EditTaskScreen extends StatefulWidget {
   final String id;
-  EditTaskScreen({required this.id});
+  const EditTaskScreen({super.key, required this.id});
 
   @override
   State<EditTaskScreen> createState() => _EditTaskScreen();
@@ -96,7 +96,7 @@ class _EditTaskScreen extends State<EditTaskScreen> {
                 decoration: const InputDecoration(labelText: 'Add Description'),
               ),
               DropdownButtonFormField<String>(
-                value: _selectedPriority,
+                initialValue: _selectedPriority,
                 items: ['High', 'Medium', 'Low']
                     .map((p) => DropdownMenuItem(value: p, child: Text(p)))
                     .toList(),
