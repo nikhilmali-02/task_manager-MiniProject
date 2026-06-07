@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import 'package:task_manager/Controllers/task_controller.dart';
 import 'package:task_manager/bloc/TaskState.dart';
 import 'package:task_manager/bloc/task_bloc.dart';
 import 'package:task_manager/bloc/task_event.dart';
-import 'package:task_manager/main.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
