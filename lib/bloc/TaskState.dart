@@ -14,6 +14,9 @@ class TaskLoadedState extends TaskState {
   TaskLoadedState({required this.task});
   @override
   List<Object?> get props => [task];
+
+  int activeCount() => task.where((t) => !t.isCompleted).length;
+  int completedCount() => task.where((t) => t.isCompleted).length;
 }
 
 class TaskErrorState extends TaskState {

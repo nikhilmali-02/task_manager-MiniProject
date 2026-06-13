@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_manager/bloc/task_bloc.dart';
 import 'package:task_manager/bloc/task_event.dart';
 import 'package:task_manager/models/TaskModel.dart';
@@ -44,76 +44,255 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
   }
 
+  Color _priorityColor(String priority) {
+    switch (priority) {
+      case 'High':
+        return Colors.redAccent;
+      case 'Low':
+        return Colors.blueAccent;
+      default:
+        return Colors.orangeAccent;
+    }
+  }
+
+  String _formatDateTime(DateTime dt) {
+    return '${dt.day}/${dt.month}/${dt.year}  ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark
+        ? const Color(0xFF121212)
+        : const Color.fromARGB(255, 202, 210, 247);
+    final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final labelColor = isDark ? Colors.white : Colors.black87;
+    final hintColor = isDark ? Colors.grey[400] : Colors.grey[500];
+
     return Scaffold(
+      backgroundColor: bgColor,
       appBar: AppBar(
-        title: Text("Add Task"),
+        backgroundColor: bgColor,
+        elevation: 0,
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: labelColor),
         ),
+        title: Text(
+          'Add New Task',
+          style: TextStyle(
+            color: labelColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                final task = TaskModel(
+                  id: const Uuid().v4(),
+                  title: _titleController.text,
+                  subtitle: _subtitleController.text.isEmpty
+                      ? null
+                      : _subtitleController.text,
+                  priority: _selectedPriority,
+                  time: _selectedTime ?? DateTime.now(),
+                );
+                context.read<TaskBloc>().add(AddTaskEvent(task: task));
+                context.pop();
+              }
+            },
+            child: const Text(
+              'Save',
+              style: TextStyle(
+                color: Color(0xFF5C6BC0),
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
       ),
-      body: Center(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextFormField(
-                controller: _titleController,
-                textAlign: TextAlign.left,
-                decoration: const InputDecoration(labelText: 'Enter the Task'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please Enter Task';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _subtitleController,
-                textAlign: TextAlign.left,
-                decoration: const InputDecoration(labelText: 'Add Description'),
-              ),
-              DropdownButtonFormField<String>(
-                initialValue: _selectedPriority,
-                items: ['High', 'Medium', 'Low']
-                    .map((p) => DropdownMenuItem(value: p, child: Text(p)))
-                    .toList(),
-                onChanged: (value) =>
-                    setState(() => _selectedPriority = value!),
-                decoration: InputDecoration(labelText: "Priority"),
-              ),
-              ListTile(
-                title: Text(
-                  _selectedTime == null
-                      ? 'Select Time'
-                      : _selectedTime.toString(),
+              // Task Title
+              Text(
+                'Task Title',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: labelColor,
                 ),
-                trailing: Icon(Icons.access_time),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: TextFormField(
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter task title...',
+                    hintStyle: TextStyle(color: hintColor),
+                    prefixIcon: Icon(
+                      Icons.check_circle_outline,
+                      color: const Color(0xFF5C6BC0),
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 12,
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a task title';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Description
+              Text(
+                'Description (Optional)',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: labelColor,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: TextFormField(
+                  controller: _subtitleController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    hintText: 'Add task description...',
+                    hintStyle: TextStyle(color: hintColor),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.only(bottom: 40),
+                      child: Icon(Icons.notes, color: const Color(0xFF5C6BC0)),
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 12,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Priority
+              Text(
+                'Priority',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: labelColor,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButtonFormField<String>(
+                    initialValue: _selectedPriority,
+                    dropdownColor: cardColor,
+                    decoration: const InputDecoration(border: InputBorder.none),
+                    items: ['High', 'Medium', 'Low'].map((p) {
+                      return DropdownMenuItem(
+                        value: p,
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: _priorityColor(p),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              '$p Priority',
+                              style: TextStyle(color: labelColor),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (value) =>
+                        setState(() => _selectedPriority = value!),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Due Date / Time
+              Text(
+                'Date (Optional)',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: labelColor,
+                ),
+              ),
+              const SizedBox(height: 8),
+              GestureDetector(
                 onTap: () async {
                   final picked = await _pickDateTime();
                   if (picked != null) setState(() => _selectedTime = picked);
                 },
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    final task = TaskModel(
-                      id: const Uuid().v4(),
-                      title: _titleController.text,
-                      subtitle: _subtitleController.text.isEmpty
-                          ? null
-                          : _subtitleController.text,
-                      priority: _selectedPriority,
-                      time: _selectedTime ?? DateTime.now(),
-                    );
-                    context.read<TaskBloc>().add(AddTaskEvent(task: task));
-                    context.pop();
-                  }
-                },
-                child: Text('Add Task'),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today_outlined,
+                        color: Color(0xFF5C6BC0),
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        _selectedTime == null
+                            ? 'Select date'
+                            : _formatDateTime(_selectedTime!),
+                        style: TextStyle(
+                          color: _selectedTime == null ? hintColor : labelColor,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),

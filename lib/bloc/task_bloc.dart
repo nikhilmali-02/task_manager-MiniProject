@@ -21,12 +21,19 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     on<AddTaskEvent>((event, emit) async {
       try {
         await _firestoreService.addTask(event.task);
-        await NotificationService.scheduleNotification(event.task);
-        final result = await _firestoreService.loadTasks();
-        emit(TaskLoadedState(task: result));
       } catch (e) {
         emit(TaskErrorState(message: 'Failed to Add'));
+        return;
       }
+
+      try {
+        await NotificationService.scheduleNotification(event.task);
+      } catch (e) {
+        // Notification failure is non-critical, don't affect UI state
+      }
+
+      final result = await _firestoreService.loadTasks();
+      emit(TaskLoadedState(task: result));
     });
 
     on<ToggleTaskEvent>((event, emit) async {
@@ -52,12 +59,18 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     on<UpdateTaskEvent>((event, emit) async {
       try {
         await _firestoreService.updateTask(event.task);
-        await NotificationService.scheduleNotification(event.task);
-        final result = await _firestoreService.loadTasks();
-        emit(TaskLoadedState(task: result));
       } catch (e) {
         emit(TaskErrorState(message: 'Failed to Update'));
       }
+
+      try {
+        await NotificationService.scheduleNotification(event.task);
+      } catch (e) {
+        // Notification failure is non-critical, don't affect UI state
+      }
+
+      final result = await _firestoreService.loadTasks();
+      emit(TaskLoadedState(task: result));
     });
   }
 }
